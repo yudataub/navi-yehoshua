@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>קטלוג חומרים – ספר יהושע (כיתה ג׳)</title>
+<style>
+  :root {
+    --bg: #eff6ff; --card: #ffffff; --ink: #17203a; --muted: #5b6b8c;
+    --accent: #1d4ed8; --accent2: #d97706; --border: #e1e9fb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 350px, #fffbeb 100%);
+    color: var(--ink); min-height: 100vh;
+  }
+  header { padding: 30px 20px 18px; text-align: center; position: relative; }
+  .instructions-box {
+    position: absolute; top: 18px; right: 20px; max-width: 240px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 12px 14px; text-align: right; font-size: 0.76rem; line-height: 1.5;
+    color: var(--muted); box-shadow: 0 2px 8px rgba(29,78,216,0.08);
+  }
+  .instructions-box b { color: var(--accent); }
+  .instructions-box .reset-link {
+    display: inline-block; margin-top: 8px; color: #b91c1c; cursor: pointer;
+    text-decoration: underline; font-size: 0.74rem;
+  }
+  @media (max-width: 800px) {
+    .instructions-box { position: static; max-width: 420px; margin: 14px auto 0; }
+  }
+  header h1 {
+    margin: 0 0 6px; font-size: 1.9rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+  .search-wrap {
+    max-width: 700px; margin: 16px auto 0; padding: 0 20px;
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;
+  }
+  #search {
+    flex: 1; min-width: 220px; padding: 12px 16px; border-radius: 12px;
+    border: 1px solid var(--border); font-size: 1rem; background: var(--card);
+    box-shadow: 0 1px 4px rgba(29,78,216,0.07);
+  }
+  #search:focus { outline: 2px solid var(--accent2); }
+  .show-hidden-toggle {
+    display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--muted);
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 14px; cursor: pointer; white-space: nowrap;
+  }
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    padding: 18px 20px 10px; max-width: 1080px; margin: 0 auto;
+  }
+  .tab-btn {
+    flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    padding: 9px 16px; cursor: pointer; font-size: 0.88rem; color: var(--ink);
+    white-space: nowrap; transition: all .15s;
+  }
+  .tab-btn:hover { border-color: var(--accent2); }
+  .tab-btn.active {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: white; border-color: transparent;
+  }
+  .tab-count { background: rgba(0,0,0,0.08); border-radius: 999px; padding: 1px 8px; font-size: 0.75rem; }
+  .tab-btn.active .tab-count { background: rgba(255,255,255,0.28); }
+  main { max-width: 920px; margin: 0 auto; padding: 10px 20px 60px; }
+  .topic-heading { display: flex; align-items: baseline; gap: 10px; margin: 18px 0 12px; }
+  .topic-heading h2 { margin: 0; font-size: 1.4rem; }
+  .topic-heading span.count { color: var(--muted); font-size: 0.9rem; }
+  .category-group {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    margin-bottom: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(29,78,216,0.05);
+  }
+  .category-header {
+    padding: 13px 18px; display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer; background: linear-gradient(90deg, #eef4ff, #ffffff);
+  }
+  .category-title { font-weight: 600; font-size: 0.98rem; }
+  .category-count { font-size: 0.78rem; color: var(--muted); background: var(--bg); padding: 3px 10px; border-radius: 999px; }
+  .category-toggle { color: var(--accent); font-size: 0.9rem; margin-inline-start: 10px; }
+  .file-list { display: block; }
+  .file-list.collapsed { display: none; }
+  .file-row-wrap { display: flex; align-items: center; gap: 2px; border-top: 1px solid var(--border); transition: background .12s; }
+  .file-row-wrap:hover { background: #f7faff; }
+  .file-row-wrap.is-hidden { opacity: 0.45; }
+  .icon-btn {
+    flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 1.02rem;
+    padding: 10px 5px; line-height: 1; color: #a9b8dd; transition: transform .1s;
+  }
+  .icon-btn:hover { transform: scale(1.18); color: var(--accent); }
+  .rating-box { display: flex; align-items: center; gap: 1px; flex-shrink: 0; padding: 4px 6px; border-radius: 8px; }
+  .rating-box.mine { background: #fff7e0; box-shadow: inset 0 0 0 1px #f5c94d; }
+  .rating-star { cursor: pointer; font-size: 0.95rem; color: #d8ddec; transition: transform .08s; line-height: 1; }
+  .rating-star:hover { transform: scale(1.2); }
+  .rating-star.filled { color: #f5b301; }
+  .rating-meta { font-size: 0.66rem; color: var(--muted); margin-inline-start: 5px; white-space: nowrap; }
+  .file-row { display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 0; text-decoration: none; color: var(--ink); flex: 1; min-width: 0; }
+  .file-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0; }
+  .file-name { flex: 1; font-size: 0.9rem; line-height: 1.35; }
+  .file-name.renamed::after { content: " (שם ערוך)"; font-size: 0.68rem; color: var(--accent2); font-weight: 400; }
+  .file-size { font-size: 0.72rem; color: var(--muted); flex-shrink: 0; white-space: nowrap; }
+  .file-type-badge { font-size: 0.7rem; padding: 2px 9px; border-radius: 999px; flex-shrink: 0; white-space: nowrap; }
+  .hidden-badge { font-size: 0.68rem; padding: 2px 8px; border-radius: 999px; background: #fee2e2; color: #b91c1c; flex-shrink: 0; }
+  .empty-state { text-align: center; color: var(--muted); padding: 60px 20px; display: none; }
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding: 20px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(23,32,58,0.45); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--card); border-radius: 16px; padding: 22px; max-width: 360px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+  .modal-box h3 { margin: 0 0 14px; font-size: 1.05rem; }
+  .modal-box label { display: block; font-size: 0.82rem; color: var(--muted); margin: 12px 0 4px; }
+  .modal-box select { width: 100%; padding: 9px 10px; border-radius: 9px; border: 1px solid var(--border); font-size: 0.9rem; background: #fff; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 18px; justify-content: flex-end; }
+  .modal-btn { padding: 9px 18px; border-radius: 9px; border: none; cursor: pointer; font-size: 0.88rem; }
+  .modal-btn.save { background: var(--accent); color: white; }
+  .modal-btn.cancel { background: var(--bg); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="instructions-box">
+    <b>⭐ דירוג משותף</b><br>
+    לוחצים על אחד מ-5 הכוכבים ליד כל קובץ כדי לדרג אותו. הדירוג נשמר בענן ומשותף לכל מי שפותח את הקטלוג הזה.<br><br>
+    <b>✏️ שינוי שם | 🙈 הסתרה | 📁 העברה</b><br>
+    אפשר לערוך שם תצוגה, להסתיר קובץ, או להעביר אותו לנושא/קטגוריה אחרים - שינויים אלו אישיים ונשמרים רק אצלך בדפדפן.
+    <div class="reset-link" id="resetLink">איפוס ההתאמות האישיות שלי</div>
+  </div>
+  <h1>קטלוג חומרים – ספר יהושע (כיתה ג׳)</h1>
+  <p id="fileCountLine">279 פריטים לפי פרקים – 264 קבצים שמורים כאן, והשאר קישורים</p>
+</header>
+
+<div class="search-wrap">
+  <input id="search" type="text" placeholder="חיפוש בכל הנושאים לפי שם קובץ..." />
+  <label class="show-hidden-toggle">
+    <input type="checkbox" id="showHiddenChk" />
+    הצג קבצים מוסתרים
+  </label>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<main id="main"></main>
+<div class="empty-state" id="emptyState">לא נמצאו קבצים תואמים לחיפוש</div>
+
+<footer>
+  <div style="font-weight:600; color:var(--accent); margin-bottom:4px;">הרב יהודה טאוב</div>
+  <div>הקבצים שמורים באתר זה; סרטונים, תיקיות ואתרים נפתחים במקורם</div>
+</footer>
+
+<div class="modal-overlay" id="moveModal">
+  <div class="modal-box">
+    <h3>📁 העברת קובץ</h3>
+    <label>נושא יעד</label>
+    <select id="moveTopicSelect"></select>
+    <label>קטגוריה יעד</label>
+    <select id="moveCategorySelect"></select>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="moveCancelBtn">ביטול</button>
+      <button class="modal-btn save" id="moveSaveBtn">שמירה</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getFirestore, doc, getDocs, collection, query, where, documentId, runTransaction
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {"apiKey": "AIzaSyBgjtJk9Wrw-lPpFlPBaQ6RHfqQ58R58LA", "authDomain": "gamma-catalog.firebaseapp.com", "projectId": "gamma-catalog", "storageBucket": "gamma-catalog.firebasestorage.app", "messagingSenderId": "184606827021", "appId": "1:184606827021:web:e39a832b5bc12fe87aeb44"};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+const ratingsCache = new Map(); // id -> {sum, count}
+
+function chunkArr(arr, n) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+  return out;
+}
+
+async function fetchRatings(ids) {
+  const need = [...new Set(ids)].filter(id => !ratingsCache.has(id));
+  if (need.length === 0) return;
+  const batches = chunkArr(need, 10);
+  await Promise.all(batches.map(async (b) => {
+    b.forEach(id => ratingsCache.set(id, { sum: 0, count: 0 }));
+    try {
+      const q = query(collection(db, 'ratings'), where(documentId(), 'in', b));
+      const snap = await getDocs(q);
+      snap.forEach(d => ratingsCache.set(d.id, d.data()));
+    } catch (e) {
+      console.error('fetchRatings failed', e);
+    }
+  }));
+}
+
+async function submitRating(id, newValue, oldValue) {
+  const ref = doc(db, 'ratings', id);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    let sum = 0, count = 0;
+    if (snap.exists()) { sum = snap.data().sum || 0; count = snap.data().count || 0; }
+    if (oldValue) { sum += (newValue - oldValue); } else { sum += newValue; count += 1; }
+    tx.set(ref, { sum, count });
+  });
+}
+
+window.__ratingsApi = { fetchRatings, submitRating, ratingsCache };
+window.dispatchEvent(new Event('ratings-ready'));
+</script>
+
+<script>
+const ORDER = ["הקדמה לספר", "כללי – כל הספר", "פרק א", "פרק ב", "פרק ג", "פרק ד", "פרק ה", "פרק ו", "פרק ז", "פרק ח", "פרק ט", "פרק י", "פרק יא", "פרק יב", "פרק יג", "פרק יד", "פרק טו", "פרק טז", "פרק יח", "פרק יט", "פרק כ", "פרק כא", "פרק כב", "פרק כג", "פרק כד"];
+const FLAT_ITEMS = [{"id": "x_0bc09fbf47fb", "name": "שיר ספר יהושע – המנון", "type": "video", "size": "", "topic": "כללי – כל הספר", "category": "שיעורים - סרטונים ומצגות", "url": "https://www.youtube.com/watch?v=JyEmQkMnWTI"}, {"id": "x_ecb4c4b5b07e", "name": "שירים ונביאים ראשונים – רצף הנביאים והמנון יהושע", "type": "video", "size": "", "topic": "כללי – כל הספר", "category": "שיעורים - סרטונים ומצגות", "url": "https://www.youtube.com/watch?v=Vd0zH0KGivQ"}, {"id": "1sy69XGl_uBRdBQlsAtoubECCVdvz_9CIXiLmXpQ_PAs", "name": "סיכום הדרכת ספר יהושע", "type": "word", "size": "14KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A1%D7%99%D7%9B%D7%95%D7%9D%20%D7%94%D7%93%D7%A8%D7%9B%D7%AA%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_1ab045a8f2e3", "name": "השתלמות נביאים – יהושע ושופטים (מכון הרצוג)", "type": "web", "size": "", "topic": "כללי – כל הספר", "category": "הדרכה ותכנון למורה", "url": "https://did.li/epGx5"}, {"id": "x_a9f528c51191", "name": "תיקיית Drive – חומרי למידה לספר יהושע", "type": "folder", "size": "", "topic": "כללי – כל הספר", "category": "תיקיות וקישורים", "url": "https://drive.google.com/drive/folders/1bodqRJk0_gqp258BmLKY9m0O2PEIzlIy"}, {"id": "x_e9086ba55cb2", "name": "חומרי יהושע לחינוך המיוחד – פורטל משרד החינוך", "type": "web", "size": "", "topic": "כללי – כל הספר", "category": "חומרים כלליים נוספים", "url": "https://pop.education.gov.il/tchumey_daat/bible-hemed/elementary/teaching-materials/prophet-joshua/"}, {"id": "x_a02b249719cc", "name": "תיקיית Drive – חומרי יהושע (מצגות ודפי עבודה)", "type": "folder", "size": "", "topic": "כללי – כל הספר", "category": "תיקיות וקישורים", "url": "https://drive.google.com/drive/folders/1F_1BRAOGevI_IYnEa_fIEHuJR0NawX8l"}, {"id": "x_44594bc805a8", "name": "אביטה – ספר יהושע", "type": "web", "size": "", "topic": "כללי – כל הספר", "category": "חומרים כלליים נוספים", "url": "https://www.abita.co.il/lesson_category/%D7%99%D7%94%D7%95%D7%A9%D7%A2/"}, {"id": "1jqslDCOMW9Couea9W-RmrwwwZL6H8aSk", "name": "מצגת פתיחה לנביא יהושע", "type": "ppt", "size": "1.7MB", "topic": "כללי – כל הספר", "category": "מצגות", "url": "files/%D7%9E%D7%A6%D7%92%D7%AA%20%D7%A4%D7%AA%D7%99%D7%97%D7%94%20%D7%9C%D7%A0%D7%91%D7%99%D7%90%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.pptx"}, {"id": "x_aafd4c13cdea", "name": "הדרכה מוקלטת לספר יהושע – מדריך ארצי", "type": "video", "size": "", "topic": "כללי – כל הספר", "category": "הדרכה ותכנון למורה", "url": "https://youtu.be/oBlT6KGN_Ak"}, {"id": "x_16fca13a3d34", "name": "תיקיית Google Drive – יהושע (מצגות ועטיפות)", "type": "folder", "size": "", "topic": "כללי – כל הספר", "category": "תיקיות וקישורים", "url": "https://drive.google.com/drive/folders/1iAOq7epWpoK1llSRgGH5-xyatpgfdfUF"}, {"id": "1nf_VNTbpAeNrAc0s7qjUGgC4NpcAj3Iy", "name": "חוברת עבודה לספר יהושע- 1", "type": "pdf", "size": "1.3MB", "topic": "כללי – כל הספר", "category": "חוברות עבודה", "url": "files/%D7%97%D7%95%D7%91%D7%A8%D7%AA%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2-%201.pdf"}, {"id": "x_a534fe78ea52", "name": "ילדי התנ״ך – פודקאסט סיפורי התנ״ך לילדים (Spotify)", "type": "web", "size": "", "topic": "כללי – כל הספר", "category": "שיעורים - סרטונים ומצגות", "url": "https://open.spotify.com/show/5Hg2VofmbbZ8P4OZOLC7Sw"}, {"id": "x_1280f4bd343c", "name": "ילדי התנ״ך – פודקאסט סיפורי התנ״ך לילדים (YouTube)", "type": "video", "size": "", "topic": "כללי – כל הספר", "category": "שיעורים - סרטונים ומצגות", "url": "https://www.youtube.com/watch?v=U0Az_V0dHb4"}, {"id": "x_f44fc948da1f", "name": "דרייב יהושע", "type": "folder", "size": "", "topic": "כללי – כל הספר", "category": "תיקיות וקישורים", "url": "https://drive.google.com/drive/folders/1ZB2cGGMkqKlL5R-LMPvw7PFFu39Ltg2A?usp=sharing"}, {"id": "x_d916ed827311", "name": "הדרכה כללית לקראת הוראת ספר יהושע", "type": "video", "size": "", "topic": "כללי – כל הספר", "category": "הדרכה ותכנון למורה", "url": "https://youtu.be/dE4NN1unPpU?si=Cuod_gEKUH44joj4"}, {"id": "1OvGxxRQq64VLwE96S271f0Js06J9xjVM", "name": "מחברת יהושע- עטיפה", "type": "pdf", "size": "130KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%97%D7%91%D7%A8%D7%AA%20%D7%99%D7%94%D7%95%D7%A9%D7%A2-%20%D7%A2%D7%98%D7%99%D7%A4%D7%94.pdf"}, {"id": "1M-OKX_n7d0Z9KClzaakdV7HLBvqPVX1V", "name": "הַקְדָּמָה לְסֵפֶר יְהוֹשֻׁעַ - טקסט (מנוקד)+משימות", "type": "pdf", "size": "325KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%94%D6%B7%D7%A7%D6%B0%D7%93%D6%BC%D6%B8%D7%9E%D6%B8%D7%94%20%D7%9C%D6%B0%D7%A1%D6%B5%D7%A4%D6%B6%D7%A8%20%D7%99%D6%B0%D7%94%D7%95%D6%B9%D7%A9%D7%81%D6%BB%D7%A2%D6%B7%20-%20%D7%98%D7%A7%D7%A1%D7%98%20%28%D7%9E%D7%A0%D7%95%D7%A7%D7%93%29%2B%D7%9E%D7%A9%D7%99%D7%9E%D7%95%D7%AA.pdf"}, {"id": "x_426070502d13", "name": "שיעור מס' 1 - ההכנות למעבר הירדן", "type": "web", "size": "", "topic": "פרק א", "category": "שיעורים - סרטונים ומצגות", "url": "https://www.abita.co.il/lessons/10233-2/תנך-ממד-ג-יהושע-ההכנות-למעבר-הירדן/"}, {"id": "1U2KfZqOLw6rnbO6F8MfgeyecjziQSU5t", "name": "חוברת לספר יהושע", "type": "pdf", "size": "1.2MB", "topic": "כללי – כל הספר", "category": "חוברות עבודה", "url": "files/%D7%97%D7%95%D7%91%D7%A8%D7%AA%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.pdf"}, {"id": "x_00f712adb73b", "name": "שיעור מס' 2 - ה' מחזק את יהושע", "type": "web", "size": "", "topic": "פרק א", "category": "שיעורים - סרטונים ומצגות", "url": "https://www.abita.co.il/lessons/10233-2/תנך-ממד-ג-יהושע-ה-מחזק-את-יהושע/"}, {"id": "1Gz1cwkLXmsdrGQfXA78aKvukzlj0p9nH", "name": "חוברת עבודה ספר יהושע", "type": "pdf", "size": "490KB", "topic": "כללי – כל הספר", "category": "חוברות עבודה", "url": "files/%D7%97%D7%95%D7%91%D7%A8%D7%AA%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.pdf"}, {"id": "1orQAJe9u5b08TKePaoBaDKCT723rgaGC", "name": "ספר יהושע - חוברת עבודה (גדסי)", "type": "pdf", "size": "2.2MB", "topic": "כללי – כל הספר", "category": "חוברות עבודה", "url": "files/%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2%20-%20%D7%97%D7%95%D7%91%D7%A8%D7%AA%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%28%D7%92%D7%93%D7%A1%D7%99%29.pdf"}, {"id": "x_9b63f6d8a8fc", "name": "2התשף תכנון מקרא נביא", "type": "pdf", "size": "560KB", "topic": "כללי – כל הספר", "category": "הדרכה ותכנון למורה", "url": "files/2%D7%94%D7%AA%D7%A9%D7%A3%20%D7%AA%D7%9B%D7%A0%D7%95%D7%9F%20%D7%9E%D7%A7%D7%A8%D7%90%20%D7%A0%D7%91%D7%99%D7%90.pdf"}, {"id": "x_94c7e89f6761", "name": "A62 שלטים לטבלת מלחמות יהושע", "type": "word", "size": "30KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/A62%20%D7%A9%D7%9C%D7%98%D7%99%D7%9D%20%D7%9C%D7%98%D7%91%D7%9C%D7%AA%20%D7%9E%D7%9C%D7%97%D7%9E%D7%95%D7%AA%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_bc581b2af245", "name": "BE5 טבלת מלחמות ללוח", "type": "word", "size": "27KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/BE5%20%D7%98%D7%91%D7%9C%D7%AA%20%D7%9E%D7%9C%D7%97%D7%9E%D7%95%D7%AA%20%D7%9C%D7%9C%D7%95%D7%97.doc"}, {"id": "x_c4476813edc2", "name": "D6B שלטים לטבלת קרבות ללוח", "type": "word", "size": "54KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/D6B%20%D7%A9%D7%9C%D7%98%D7%99%D7%9D%20%D7%9C%D7%98%D7%91%D7%9C%D7%AA%20%D7%A7%D7%A8%D7%91%D7%95%D7%AA%20%D7%9C%D7%9C%D7%95%D7%97.doc"}, {"id": "x_ef65106f1585", "name": "בינגו", "type": "word", "size": "128KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%91%D7%99%D7%A0%D7%92%D7%95.doc"}, {"id": "x_383580be6cf7", "name": "דגשים לספר יהושע עמירם אלבה תשעו מבוסס על הרב ויזנר, הרב ויינר, הרב נתנאל ועוד", "type": "word", "size": "119KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%92%D7%A9%D7%99%D7%9D%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A2%D7%9E%D7%99%D7%A8%D7%9D%20%D7%90%D7%9C%D7%91%D7%94%20%D7%AA%D7%A9%D7%A2%D7%95%20%D7%9E%D7%91%D7%95%D7%A1%D7%A1%20%D7%A2%D7%9C%20%D7%94%D7%A8%D7%91%20%D7%95%D7%99%D7%96%D7%A0%D7%A8%2C%20%D7%94%D7%A8%D7%91%20%D7%95%D7%99%D7%99%D7%A0%D7%A8%2C%20%D7%94%D7%A8%D7%91%20%D7%A0%D7%AA%D7%A0%D7%90%D7%9C%20%D7%95%D7%A2%D7%95%D7%93.docx"}, {"id": "x_13af7dbbfc77", "name": "חוברת עבודה על ספר יהושע", "type": "pdf", "size": "622KB", "topic": "כללי – כל הספר", "category": "חוברות עבודה", "url": "files/%D7%97%D7%95%D7%91%D7%A8%D7%AA%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%A2%D7%9C%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.pdf"}, {"id": "x_416166d61503", "name": "טבלתקרבות יהושע", "type": "word", "size": "26KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%98%D7%91%D7%9C%D7%AA%D7%A7%D7%A8%D7%91%D7%95%D7%AA%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_2ea461bb8adb", "name": "יהושע-עבודת סיכום", "type": "word", "size": "44KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2-%D7%A2%D7%91%D7%95%D7%93%D7%AA%20%D7%A1%D7%99%D7%9B%D7%95%D7%9D.doc"}, {"id": "x_daf740d103f6", "name": "כותרות לקשוט יהושע", "type": "word", "size": "20KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9B%D7%95%D7%AA%D7%A8%D7%95%D7%AA%20%D7%9C%D7%A7%D7%A9%D7%95%D7%98%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_a79cc35c1951", "name": "כיבוש העי תמונות", "type": "word", "size": "522KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9B%D7%99%D7%91%D7%95%D7%A9%20%D7%94%D7%A2%D7%99%20%D7%AA%D7%9E%D7%95%D7%A0%D7%95%D7%AA.docx"}, {"id": "x_a8c9ab0836da", "name": "כיבושי יהושע", "type": "word", "size": "30KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9B%D7%99%D7%91%D7%95%D7%A9%D7%99%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_d399961bb700", "name": "מלחמת הדרום תמונות", "type": "word", "size": "954KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9E%D7%9C%D7%97%D7%9E%D7%AA%20%D7%94%D7%93%D7%A8%D7%95%D7%9D%20%D7%AA%D7%9E%D7%95%D7%A0%D7%95%D7%AA.docx"}, {"id": "x_37b2d13fcfc8", "name": "נפילת חומות יריחו- למחברת", "type": "pdf", "size": "136KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/%D7%A0%D7%A4%D7%99%D7%9C%D7%AA%20%D7%97%D7%95%D7%9E%D7%95%D7%AA%20%D7%99%D7%A8%D7%99%D7%97%D7%95-%20%D7%9C%D7%9E%D7%97%D7%91%D7%A8%D7%AA.pdf"}, {"id": "x_d4dd0d5b1527", "name": "סדר הארועים לספר יהושע", "type": "word", "size": "29KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A1%D7%93%D7%A8%20%D7%94%D7%90%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_51ea1623efd8", "name": "סיום ספר יהושע בחרוזים - שלי", "type": "word", "size": "275KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A1%D7%99%D7%95%D7%9D%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%91%D7%97%D7%A8%D7%95%D7%96%D7%99%D7%9D%20-%20%D7%A9%D7%9C%D7%99.docx"}, {"id": "x_fcbc90bbd3b9", "name": "סיכום הפרקים בספר יהושע", "type": "word", "size": "28KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A1%D7%99%D7%9B%D7%95%D7%9D%20%D7%94%D7%A4%D7%A8%D7%A7%D7%99%D7%9D%20%D7%91%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_fd0d88a74db1", "name": "סיכום ספר יהושע עם מדרשים", "type": "word", "size": "880KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A1%D7%99%D7%9B%D7%95%D7%9D%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A2%D7%9D%20%D7%9E%D7%93%D7%A8%D7%A9%D7%99%D7%9D.doc"}, {"id": "x_3d8db05c6455", "name": "שאלות על חלוקת הנחלות", "type": "word", "size": "2.8MB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A2%D7%9C%20%D7%97%D7%9C%D7%95%D7%A7%D7%AA%20%D7%94%D7%A0%D7%97%D7%9C%D7%95%D7%AA.doc"}, {"id": "x_d272d096d38b", "name": "שאלות", "type": "word", "size": "958KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA.doc"}, {"id": "x_8cb17118e933", "name": "שות ספר יהושע", "type": "word", "size": "227KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%95%D7%AA%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_76d8f267ee49", "name": "שיעורים ביהושע", "type": "word", "size": "150KB", "topic": "כללי – כל הספר", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99%D7%9D%20%D7%91%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_2c4d1f075050", "name": "שער למחברת יהושע", "type": "word", "size": "179KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/%D7%A9%D7%A2%D7%A8%20%D7%9C%D7%9E%D7%97%D7%91%D7%A8%D7%AA%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_1ac35a9d62c6", "name": "שער מחברת נביא", "type": "word", "size": "700KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/%D7%A9%D7%A2%D7%A8%20%D7%9E%D7%97%D7%91%D7%A8%D7%AA%20%D7%A0%D7%91%D7%99%D7%90.doc"}, {"id": "x_ddf58ba5e85b", "name": "תכנון ספר יהושע", "type": "word", "size": "25KB", "topic": "כללי – כל הספר", "category": "הדרכה ותכנון למורה", "url": "files/%D7%AA%D7%9B%D7%A0%D7%95%D7%9F%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_bfec171c27a5", "name": "תכנית עבודה ביהושע", "type": "word", "size": "19KB", "topic": "כללי – כל הספר", "category": "הדרכה ותכנון למורה", "url": "files/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%91%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_3053f8cc3ca0", "name": "1 -ג", "type": "word", "size": "34KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/1%20-%D7%92.docx"}, {"id": "x_827b0ba24762", "name": "1 -ד-ה", "type": "word", "size": "32KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/1%20-%D7%93-%D7%94.docx"}, {"id": "x_2e370addf3b1", "name": "1 -ד", "type": "word", "size": "43KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/1%20-%D7%93.docx"}, {"id": "x_e69335b5ecf7", "name": "2 -ג", "type": "word", "size": "31KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/2%20-%D7%92.docx"}, {"id": "x_92c69bf7a829", "name": "lilmodveodyungerman130600", "type": "word", "size": "716KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman130600.doc"}, {"id": "x_d8bf5a2fd8a5", "name": "lilmodveodyungerman230598", "type": "word", "size": "707KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman230598.doc"}, {"id": "x_48d341320e22", "name": "ד- 2", "type": "word", "size": "33KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93-%202.docx"}, {"id": "x_53ccd29af0a3", "name": "דף לפתיחת יהושע", "type": "pdf", "size": "329KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%9C%D7%A4%D7%AA%D7%99%D7%97%D7%AA%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.pdf"}, {"id": "x_fdd522d8989a", "name": "דף עבודה הקדמה לספר יהושע", "type": "word", "size": "22KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%94%D7%A7%D7%93%D7%9E%D7%94%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_bc3f45536aa3", "name": "דף עבודה להקדמה של ספר יהושע", "type": "word", "size": "122KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%9C%D7%94%D7%A7%D7%93%D7%9E%D7%94%20%D7%A9%D7%9C%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_e26ba177e77f", "name": "דף פרק א2", "type": "pdf", "size": "240KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A4%D7%A8%D7%A7%20%D7%902.pdf"}, {"id": "x_910838ad7d90", "name": "העברת שיעור הקדמה לספר יהושע - ליקוט מקבצים", "type": "word", "size": "24KB", "topic": "הקדמה לספר", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%94%D7%A2%D7%91%D7%A8%D7%AA%20%D7%A9%D7%99%D7%A2%D7%95%D7%A8%20%D7%94%D7%A7%D7%93%D7%9E%D7%94%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2%20-%20%D7%9C%D7%99%D7%A7%D7%95%D7%98%20%D7%9E%D7%A7%D7%91%D7%A6%D7%99%D7%9D.docx"}, {"id": "x_7e687d660228", "name": "הקדמה לספר יהושוע - סדר הזמנים ודמותו של יהושוע", "type": "word", "size": "18KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%94%D7%A7%D7%93%D7%9E%D7%94%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%95%D7%A2%20-%20%D7%A1%D7%93%D7%A8%20%D7%94%D7%96%D7%9E%D7%A0%D7%99%D7%9D%20%D7%95%D7%93%D7%9E%D7%95%D7%AA%D7%95%20%D7%A9%D7%9C%20%D7%99%D7%94%D7%95%D7%A9%D7%95%D7%A2.docx"}, {"id": "x_da121d1b64c5", "name": "יהושע א דף סיכום הרב יהודה ויינר", "type": "word", "size": "30KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%90%20%D7%93%D7%A3%20%D7%A1%D7%99%D7%9B%D7%95%D7%9D%20%D7%94%D7%A8%D7%91%20%D7%99%D7%94%D7%95%D7%93%D7%94%20%D7%95%D7%99%D7%99%D7%A0%D7%A8.doc"}, {"id": "x_618987ad7697", "name": "יהושע א דף סיכום למחברת הרב יהודה ויינר", "type": "word", "size": "25KB", "topic": "פרק א", "category": "קיר ומפות ועיצוב", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%90%20%D7%93%D7%A3%20%D7%A1%D7%99%D7%9B%D7%95%D7%9D%20%D7%9C%D7%9E%D7%97%D7%91%D7%A8%D7%AA%20%D7%94%D7%A8%D7%91%20%D7%99%D7%94%D7%95%D7%93%D7%94%20%D7%95%D7%99%D7%99%D7%A0%D7%A8.docx"}, {"id": "x_66ef3bc807a4", "name": "יהושע א דפי עבודה", "type": "word", "size": "21KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%90%20%D7%93%D7%A4%D7%99%20%D7%A2%D7%91%D7%95%D7%93%D7%94.docx"}, {"id": "x_1609f171a0c1", "name": "יהושע א", "type": "word", "size": "25KB", "topic": "פרק א", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%90.doc"}, {"id": "x_99009e364c9b", "name": "יהושע הקדמה דף עבודה 1", "type": "word", "size": "17KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%94%D7%A7%D7%93%D7%9E%D7%94%20%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94%201.docx"}, {"id": "x_028f7c4e5cef", "name": "יהושע הקדמה לספר דף עבודה", "type": "pdf", "size": "289KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%94%D7%A7%D7%93%D7%9E%D7%94%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94.pdf"}, {"id": "x_53543efa1983", "name": "יהושע הקדמה, דף עבודה", "type": "word", "size": "18KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%94%D7%A7%D7%93%D7%9E%D7%94%2C%20%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94.docx"}, {"id": "x_e68888292d75", "name": "יהושע מבוא דף עבודה(1)", "type": "word", "size": "22KB", "topic": "הקדמה לספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%9E%D7%91%D7%95%D7%90%20%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94%281%29.docx"}, {"id": "x_1534da734448", "name": "מערכי שיעור הקדמה ושאלות פרקים א-ב- גיא", "type": "word", "size": "98KB", "topic": "הקדמה לספר", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%9E%D7%A2%D7%A8%D7%9B%D7%99%20%D7%A9%D7%99%D7%A2%D7%95%D7%A8%20%D7%94%D7%A7%D7%93%D7%9E%D7%94%20%D7%95%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A4%D7%A8%D7%A7%D7%99%D7%9D%20%D7%90-%D7%91-%20%D7%92%D7%99%D7%90.doc"}, {"id": "x_2448b2ff6c19", "name": "3-ג(1)", "type": "word", "size": "27KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/3-%D7%92%281%29.docx"}, {"id": "x_d9ee2dde1659", "name": "3-ד(1)", "type": "word", "size": "25KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/3-%D7%93%281%29.docx"}, {"id": "x_dbcb0ae56b01", "name": "38 -ג", "type": "word", "size": "73KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/38%20-%D7%92.docx"}, {"id": "x_040f3c552858", "name": "38 -ד", "type": "word", "size": "69KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/38%20-%D7%93.docx"}, {"id": "x_fca87fd71332", "name": "39 -ג", "type": "word", "size": "74KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/39%20-%D7%92.docx"}, {"id": "x_4d1e4d676859", "name": "39 -ד", "type": "word", "size": "71KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/39%20-%D7%93.docx"}, {"id": "x_eeb43b916b79", "name": "4-ג(1)", "type": "word", "size": "34KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/4-%D7%92%281%29.docx"}, {"id": "x_eff422aa7eea", "name": "4-ד(1)", "type": "word", "size": "32KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/4-%D7%93%281%29.docx"}, {"id": "x_ea42646fca20", "name": "achiyaizchakrabinavi01-1", "type": "pdf", "size": "339KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/achiyaizchakrabinavi01-1.pdf"}, {"id": "x_b9acd0c107bb", "name": "lilmodveodyungerman330606", "type": "word", "size": "704KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman330606.doc"}, {"id": "x_3641031d0d64", "name": "דף פרק ב אפשרות 2", "type": "pdf", "size": "470KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A4%D7%A8%D7%A7%20%D7%91%20%D7%90%D7%A4%D7%A9%D7%A8%D7%95%D7%AA%202.pdf"}, {"id": "x_e9a2e0975518", "name": "דף פרק ב", "type": "pdf", "size": "420KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A4%D7%A8%D7%A7%20%D7%91.pdf"}, {"id": "x_6cc1a6822c49", "name": "יהושע ב  המשך להמשך(1)", "type": "word", "size": "26KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%91%20%20%D7%94%D7%9E%D7%A9%D7%9A%20%D7%9C%D7%94%D7%9E%D7%A9%D7%9A%281%29.doc"}, {"id": "x_df4109c1108c", "name": "יהושע ב  המשך", "type": "word", "size": "26KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%91%20%20%D7%94%D7%9E%D7%A9%D7%9A.doc"}, {"id": "x_3727dd8f927b", "name": "יהושע ב (1)", "type": "word", "size": "26KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%91%20%281%29.doc"}, {"id": "x_7e395cd704aa", "name": "יהושע ב", "type": "word", "size": "26KB", "topic": "פרק ב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%91.doc"}, {"id": "x_73a7eb8afe4c", "name": "הכרטיסים", "type": "word", "size": "3.2MB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%94%D7%9B%D7%A8%D7%98%D7%99%D7%A1%D7%99%D7%9D.docx"}, {"id": "x_81624aa1ee16", "name": "שאלות לבינגו", "type": "word", "size": "14KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%9C%D7%91%D7%99%D7%A0%D7%92%D7%95.docx"}, {"id": "x_7b62948dadf5", "name": "5-ג(1)", "type": "word", "size": "26KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/5-%D7%92%281%29.docx"}, {"id": "x_9ff6c1c460e9", "name": "5-ד(1)", "type": "word", "size": "25KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/5-%D7%93%281%29.docx"}, {"id": "x_e42b902f4596", "name": "6-ג(1)", "type": "word", "size": "29KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/6-%D7%92%281%29.docx"}, {"id": "x_7dd3c063a749", "name": "6-ד(1)", "type": "word", "size": "27KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/6-%D7%93%281%29.docx"}, {"id": "x_04c05607a3b7", "name": "דף פרק ג", "type": "pdf", "size": "326KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A4%D7%A8%D7%A7%20%D7%92.pdf"}, {"id": "x_047b296333a2", "name": "יהושע ג חציית הירדן ויהושע כב שניים וחצי השבטים(1)", "type": "word", "size": "60KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%92%20%D7%97%D7%A6%D7%99%D7%99%D7%AA%20%D7%94%D7%99%D7%A8%D7%93%D7%9F%20%D7%95%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%9B%D7%91%20%D7%A9%D7%A0%D7%99%D7%99%D7%9D%20%D7%95%D7%97%D7%A6%D7%99%20%D7%94%D7%A9%D7%91%D7%98%D7%99%D7%9D%281%29.doc"}, {"id": "x_3aa00efd16e2", "name": "יהושע פרק ג המשך(1)", "type": "word", "size": "26KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A4%D7%A8%D7%A7%20%D7%92%20%D7%94%D7%9E%D7%A9%D7%9A%281%29.doc"}, {"id": "x_54cce3917cd2", "name": "מפה למעבר הירדן-יהושע פרק ג", "type": "word", "size": "134KB", "topic": "פרק ג", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%A4%D7%94%20%D7%9C%D7%9E%D7%A2%D7%91%D7%A8%20%D7%94%D7%99%D7%A8%D7%93%D7%9F-%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A4%D7%A8%D7%A7%20%D7%92.doc"}, {"id": "x_7827a8697b53", "name": "שאלות פרקים ג-ד", "type": "word", "size": "715KB", "topic": "פרק ג", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A4%D7%A8%D7%A7%D7%99%D7%9D%20%D7%92-%D7%93.doc"}, {"id": "x_e937084a8ccf", "name": "7 -ג", "type": "word", "size": "36KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/7%20-%D7%92.docx"}, {"id": "x_f998a39a606e", "name": "7 ד", "type": "word", "size": "31KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/7%20%D7%93.docx"}, {"id": "x_77866df61b52", "name": "8 -ג", "type": "word", "size": "37KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/8%20-%D7%92.docx"}, {"id": "x_06a9a67111a0", "name": "8 ד", "type": "word", "size": "38KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/8%20%D7%93.docx"}, {"id": "x_4f258a46bc6d", "name": "א7 ג", "type": "word", "size": "21KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%907%20%D7%92.docx"}, {"id": "x_ad439f2b05ea", "name": "א7 ד", "type": "word", "size": "19KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%907%20%D7%93.docx"}, {"id": "x_2f6b4282092b", "name": "דף עבודה סוף פרק ד", "type": "word", "size": "13KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%A1%D7%95%D7%A3%20%D7%A4%D7%A8%D7%A7%20%D7%93.docx"}, {"id": "x_9018f8da265b", "name": "דף עבודה תחילת פרק ד", "type": "pdf", "size": "372KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%AA%D7%97%D7%99%D7%9C%D7%AA%20%D7%A4%D7%A8%D7%A7%20%D7%93.pdf"}, {"id": "x_b0ad2114959c", "name": "העברת שיעור ד", "type": "word", "size": "45KB", "topic": "פרק ד", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%94%D7%A2%D7%91%D7%A8%D7%AA%20%D7%A9%D7%99%D7%A2%D7%95%D7%A8%20%D7%93.docx"}, {"id": "x_86cdfdf63654", "name": "פרק ד", "type": "pdf", "size": "396KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A4%D7%A8%D7%A7%20%D7%93.pdf"}, {"id": "x_7ca0ae0b873f", "name": "שאלות על מעמד הברכה והקללה", "type": "word", "size": "13KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A2%D7%9C%20%D7%9E%D7%A2%D7%9E%D7%93%20%D7%94%D7%91%D7%A8%D7%9B%D7%94%20%D7%95%D7%94%D7%A7%D7%9C%D7%9C%D7%94.docx"}, {"id": "x_007650b76de9", "name": "שנים עשר האבנים", "type": "word", "size": "21KB", "topic": "פרק ד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%A0%D7%99%D7%9D%20%D7%A2%D7%A9%D7%A8%20%D7%94%D7%90%D7%91%D7%A0%D7%99%D7%9D.doc"}, {"id": "x_b417e6c183e0", "name": "דגשים ונקודות עיקריות ביהושע הרב חנן ויזנר חסר הפרקים האחרונים", "type": "word", "size": "113KB", "topic": "כללי – כל הספר", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%93%D7%92%D7%A9%D7%99%D7%9D%20%D7%95%D7%A0%D7%A7%D7%95%D7%93%D7%95%D7%AA%20%D7%A2%D7%99%D7%A7%D7%A8%D7%99%D7%95%D7%AA%20%D7%91%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%94%D7%A8%D7%91%20%D7%97%D7%A0%D7%9F%20%D7%95%D7%99%D7%96%D7%A0%D7%A8%20%D7%97%D7%A1%D7%A8%20%D7%94%D7%A4%D7%A8%D7%A7%D7%99%D7%9D%20%D7%94%D7%90%D7%97%D7%A8%D7%95%D7%A0%D7%99%D7%9D.doc"}, {"id": "x_581e78348dfd", "name": "יהושע  הרב חנן ויזנר(1)", "type": "word", "size": "113KB", "topic": "כללי – כל הספר", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%20%D7%94%D7%A8%D7%91%20%D7%97%D7%A0%D7%9F%20%D7%95%D7%99%D7%96%D7%A0%D7%A8%281%29.doc"}, {"id": "x_d3ef45227b76", "name": "9 -ג(1)", "type": "word", "size": "38KB", "topic": "פרק ה", "category": "דפי עבודה ומבחנים", "url": "files/9%20-%D7%92%281%29.docx"}, {"id": "x_f04dfab97008", "name": "9 ד(1)", "type": "word", "size": "39KB", "topic": "פרק ה", "category": "דפי עבודה ומבחנים", "url": "files/9%20%D7%93%281%29.docx"}, {"id": "x_1edb8f7406e9", "name": "העברת שיעור פרק ה", "type": "word", "size": "21KB", "topic": "פרק ה", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%94%D7%A2%D7%91%D7%A8%D7%AA%20%D7%A9%D7%99%D7%A2%D7%95%D7%A8%20%D7%A4%D7%A8%D7%A7%20%D7%94.docx"}, {"id": "x_eb4ef48b615b", "name": "יהושע ה  המשך", "type": "word", "size": "20KB", "topic": "פרק ה", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%94%20%20%D7%94%D7%9E%D7%A9%D7%9A.doc"}, {"id": "x_ea9c546ce9f3", "name": "יהושע ה", "type": "word", "size": "25KB", "topic": "פרק ה", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%94.doc"}, {"id": "x_badd04b7c2c5", "name": "סיכום א-ה", "type": "word", "size": "22KB", "topic": "פרק ה", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A1%D7%99%D7%9B%D7%95%D7%9D%20%D7%90-%D7%94.docx"}, {"id": "x_01370ea62b83", "name": "פרק ה", "type": "pdf", "size": "493KB", "topic": "פרק ה", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A4%D7%A8%D7%A7%20%D7%94.pdf"}, {"id": "x_fb0bc09f2587", "name": "10-ג", "type": "word", "size": "53KB", "topic": "פרק ו", "category": "דפי עבודה ומבחנים", "url": "files/10-%D7%92.docx"}, {"id": "x_2d7b038d2df1", "name": "10-ד", "type": "word", "size": "52KB", "topic": "פרק ו", "category": "דפי עבודה ומבחנים", "url": "files/10-%D7%93.docx"}, {"id": "x_48e08c417335", "name": "11-ג", "type": "word", "size": "37KB", "topic": "פרק ו", "category": "דפי עבודה ומבחנים", "url": "files/11-%D7%92.docx"}, {"id": "x_520ca5b7a4b4", "name": "11-ד", "type": "word", "size": "37KB", "topic": "פרק ו", "category": "דפי עבודה ומבחנים", "url": "files/11-%D7%93.docx"}, {"id": "x_b5d97ccbd226", "name": "achiyaizchakrabinavi5", "type": "pdf", "size": "373KB", "topic": "פרק ו", "category": "דפי עבודה ומבחנים", "url": "files/achiyaizchakrabinavi5.pdf"}, {"id": "x_9a5bf9eaba92", "name": "העברת שיעור פרק ו", "type": "word", "size": "21KB", "topic": "פרק ו", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%94%D7%A2%D7%91%D7%A8%D7%AA%20%D7%A9%D7%99%D7%A2%D7%95%D7%A8%20%D7%A4%D7%A8%D7%A7%20%D7%95.docx"}, {"id": "x_8913891d55d0", "name": "יהושע ו", "type": "word", "size": "20KB", "topic": "פרק ו", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%95.doc"}, {"id": "x_648bf2d2a827", "name": "12 -ג", "type": "word", "size": "42KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/12%20-%D7%92.docx"}, {"id": "x_359e82dc5f4e", "name": "12-ד", "type": "word", "size": "29KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/12-%D7%93.docx"}, {"id": "x_63b1174f8a1e", "name": "13 -ג", "type": "word", "size": "40KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/13%20-%D7%92.docx"}, {"id": "x_2ff86e9dc0e2", "name": "13 -ד", "type": "word", "size": "40KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/13%20-%D7%93.docx"}, {"id": "x_2391cf4f15c9", "name": "achiyaizchakrabinavi2", "type": "pdf", "size": "371KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/achiyaizchakrabinavi2.pdf"}, {"id": "x_fa7444a1e164", "name": "דף עבודה מנוקד פרק ז", "type": "word", "size": "714KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94%20%D7%9E%D7%A0%D7%95%D7%A7%D7%93%20%D7%A4%D7%A8%D7%A7%20%D7%96.doc"}, {"id": "x_297852de4696", "name": "העברת שיעור פרק ז", "type": "word", "size": "26KB", "topic": "פרק ז", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%94%D7%A2%D7%91%D7%A8%D7%AA%20%D7%A9%D7%99%D7%A2%D7%95%D7%A8%20%D7%A4%D7%A8%D7%A7%20%D7%96.docx"}, {"id": "x_43bab64864aa", "name": "יהושע ז", "type": "word", "size": "20KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%96.doc"}, {"id": "x_2db551cb88b7", "name": "14-ג", "type": "word", "size": "54KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/14-%D7%92.docx"}, {"id": "x_da591944e60b", "name": "14-ד", "type": "word", "size": "53KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/14-%D7%93.docx"}, {"id": "x_ec8543c00bad", "name": "15-ג", "type": "word", "size": "34KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/15-%D7%92.docx"}, {"id": "x_6c0297808042", "name": "15-ד", "type": "word", "size": "23KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/15-%D7%93.docx"}, {"id": "x_24c6c2e3bcd2", "name": "16 -ג", "type": "word", "size": "24KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/16%20-%D7%92.docx"}, {"id": "x_840e44a39a8e", "name": "16 -ד", "type": "word", "size": "20KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/16%20-%D7%93.docx"}, {"id": "x_4e59f875c92c", "name": "lilmodveodyungerman830626", "type": "word", "size": "718KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman830626.doc"}, {"id": "x_8150888ad704", "name": "הברכה והקללה", "type": "word", "size": "29KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/%D7%94%D7%91%D7%A8%D7%9B%D7%94%20%D7%95%D7%94%D7%A7%D7%9C%D7%9C%D7%94.doc"}, {"id": "x_3b27e0e8d2c8", "name": "מערך שיעור נביא יהושע פרק ח", "type": "word", "size": "23KB", "topic": "פרק ח", "category": "שיעורים - סרטונים ומצגות", "url": "files/%D7%9E%D7%A2%D7%A8%D7%9A%20%D7%A9%D7%99%D7%A2%D7%95%D7%A8%20%D7%A0%D7%91%D7%99%D7%90%20%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A4%D7%A8%D7%A7%20%D7%97.doc"}, {"id": "x_45a1d1de475f", "name": "סיכום ו-ח", "type": "word", "size": "20KB", "topic": "פרק ח", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A1%D7%99%D7%9B%D7%95%D7%9D%20%D7%95-%D7%97.docx"}, {"id": "x_6bd34238c4ad", "name": "17 -ג(1)", "type": "word", "size": "28KB", "topic": "פרק ט", "category": "דפי עבודה ומבחנים", "url": "files/17%20-%D7%92%281%29.docx"}, {"id": "x_c1f118ff0ff6", "name": "17 ד-(1)", "type": "word", "size": "25KB", "topic": "פרק ט", "category": "דפי עבודה ומבחנים", "url": "files/17%20%D7%93-%281%29.docx"}, {"id": "x_e01575ab2149", "name": "17 ד-", "type": "word", "size": "25KB", "topic": "פרק ט", "category": "דפי עבודה ומבחנים", "url": "files/17%20%D7%93-.docx"}, {"id": "x_173c4e2aaa20", "name": "18 -ג(1)", "type": "word", "size": "25KB", "topic": "פרק ט", "category": "דפי עבודה ומבחנים", "url": "files/18%20-%D7%92%281%29.docx"}, {"id": "x_0d6c07183b92", "name": "18 -ד", "type": "word", "size": "23KB", "topic": "פרק ט", "category": "דפי עבודה ומבחנים", "url": "files/18%20-%D7%93.docx"}, {"id": "x_530168a530c9", "name": "18 ד-(1)", "type": "word", "size": "25KB", "topic": "פרק ט", "category": "דפי עבודה ומבחנים", "url": "files/18%20%D7%93-%281%29.docx"}, {"id": "x_5c42e43e1afd", "name": "lilmodveodyungerman930628", "type": "word", "size": "703KB", "topic": "פרק ט", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman930628.doc"}, {"id": "x_e8e295fb3e0a", "name": "28 -ג", "type": "word", "size": "26KB", "topic": "פרק טו", "category": "דפי עבודה ומבחנים", "url": "files/28%20-%D7%92.docx"}, {"id": "x_f91a59151436", "name": "28 -ד", "type": "word", "size": "19KB", "topic": "פרק טו", "category": "דפי עבודה ומבחנים", "url": "files/28%20-%D7%93.docx"}, {"id": "x_aab2a4912d28", "name": "29 -ג", "type": "word", "size": "25KB", "topic": "פרק טו", "category": "דפי עבודה ומבחנים", "url": "files/29%20-%D7%92.docx"}, {"id": "x_461ca6634d76", "name": "29 -ד", "type": "word", "size": "20KB", "topic": "פרק טו", "category": "דפי עבודה ומבחנים", "url": "files/29%20-%D7%93.docx"}, {"id": "x_e35e26cbb759", "name": "שאלות פרק טו", "type": "word", "size": "14KB", "topic": "פרק טו", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A4%D7%A8%D7%A7%20%D7%98%D7%95.docx"}, {"id": "x_4d669e5ccb63", "name": "30 -ג", "type": "word", "size": "25KB", "topic": "פרק טז", "category": "דפי עבודה ומבחנים", "url": "files/30%20-%D7%92.docx"}, {"id": "x_e74c56272bd7", "name": "30 -ד", "type": "word", "size": "22KB", "topic": "פרק טז", "category": "דפי עבודה ומבחנים", "url": "files/30%20-%D7%93.docx"}, {"id": "x_7eab308fb03a", "name": "31 -ג", "type": "word", "size": "26KB", "topic": "פרק טז", "category": "דפי עבודה ומבחנים", "url": "files/31%20-%D7%92.docx"}, {"id": "x_ff7560606251", "name": "31 -ד", "type": "word", "size": "25KB", "topic": "פרק טז", "category": "דפי עבודה ומבחנים", "url": "files/31%20-%D7%93.docx"}, {"id": "x_fad1f5ee0ddb", "name": "הפסוקים יז-סוף", "type": "word", "size": "32KB", "topic": "פרק טז", "category": "דפי עבודה ומבחנים", "url": "files/%D7%94%D7%A4%D7%A1%D7%95%D7%A7%D7%99%D7%9D%20%D7%99%D7%96-%D7%A1%D7%95%D7%A3.docx"}, {"id": "x_5b0dc8231641", "name": "טז-יט נחלות השבטים", "type": "word", "size": "27KB", "topic": "פרק טז", "category": "דפי עבודה ומבחנים", "url": "files/%D7%98%D7%96-%D7%99%D7%98%20%D7%A0%D7%97%D7%9C%D7%95%D7%AA%20%D7%94%D7%A9%D7%91%D7%98%D7%99%D7%9D.doc"}, {"id": "x_54f0551f1002", "name": "מפה מאחורה", "type": "image", "size": "99KB", "topic": "פרק טז", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%A4%D7%94%20%D7%9E%D7%90%D7%97%D7%95%D7%A8%D7%94.jpeg"}, {"id": "x_cfe24219e30c", "name": "מפה מקדימה", "type": "image", "size": "226KB", "topic": "פרק טז", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%A4%D7%94%20%D7%9E%D7%A7%D7%93%D7%99%D7%9E%D7%94.jpeg"}, {"id": "x_91bd241d206a", "name": "נחלות", "type": "pdf", "size": "278KB", "topic": "פרק טז", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A0%D7%97%D7%9C%D7%95%D7%AA.pdf"}, {"id": "x_cebd09e65b5c", "name": "שבטים למפה", "type": "word", "size": "13KB", "topic": "פרק טז", "category": "קיר ומפות ועיצוב", "url": "files/%D7%A9%D7%91%D7%98%D7%99%D7%9D%20%D7%9C%D7%9E%D7%A4%D7%94.docx"}, {"id": "x_61fe58836c1b", "name": "19 -ג(1)", "type": "word", "size": "26KB", "topic": "פרק י", "category": "דפי עבודה ומבחנים", "url": "files/19%20-%D7%92%281%29.docx"}, {"id": "x_1755f209127e", "name": "19 -ד(1)", "type": "word", "size": "23KB", "topic": "פרק י", "category": "דפי עבודה ומבחנים", "url": "files/19%20-%D7%93%281%29.docx"}, {"id": "x_c2953f03f109", "name": "20 -ג(1)", "type": "word", "size": "28KB", "topic": "פרק י", "category": "דפי עבודה ומבחנים", "url": "files/20%20-%D7%92%281%29.docx"}, {"id": "x_54ae5b5cbe66", "name": "20 -ד", "type": "word", "size": "25KB", "topic": "פרק י", "category": "דפי עבודה ומבחנים", "url": "files/20%20-%D7%93.docx"}, {"id": "x_7285c2215b73", "name": "21 -ג(1)", "type": "word", "size": "30KB", "topic": "פרק י", "category": "דפי עבודה ומבחנים", "url": "files/21%20-%D7%92%281%29.docx"}, {"id": "x_0dca5168caa5", "name": "21 -ד", "type": "word", "size": "26KB", "topic": "פרק י", "category": "דפי עבודה ומבחנים", "url": "files/21%20-%D7%93.docx"}, {"id": "x_0d71397115ab", "name": "lilmodveodyungerman1030636", "type": "word", "size": "710KB", "topic": "פרק י", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman1030636.doc"}, {"id": "x_cf72e8022ec1", "name": "22 -ג(1)", "type": "word", "size": "29KB", "topic": "פרק יא", "category": "דפי עבודה ומבחנים", "url": "files/22%20-%D7%92%281%29.docx"}, {"id": "x_c87521e49794", "name": "22 -ד(1)", "type": "word", "size": "22KB", "topic": "פרק יא", "category": "דפי עבודה ומבחנים", "url": "files/22%20-%D7%93%281%29.docx"}, {"id": "x_8141744b57fa", "name": "23 -ג(1)", "type": "word", "size": "27KB", "topic": "פרק יא", "category": "דפי עבודה ומבחנים", "url": "files/23%20-%D7%92%281%29.docx"}, {"id": "x_79084c2fcbc1", "name": "23 -ד", "type": "word", "size": "21KB", "topic": "פרק יא", "category": "דפי עבודה ומבחנים", "url": "files/23%20-%D7%93.docx"}, {"id": "x_f78e81279247", "name": "lilmodveodyungerman1130640", "type": "word", "size": "702KB", "topic": "פרק יא", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman1130640.doc"}, {"id": "x_14eef51ea14c", "name": "דף השלמת מילים מלחמת מלכי הצפון", "type": "word", "size": "105KB", "topic": "פרק יא", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%94%D7%A9%D7%9C%D7%9E%D7%AA%20%D7%9E%D7%99%D7%9C%D7%99%D7%9D%20%D7%9E%D7%9C%D7%97%D7%9E%D7%AA%20%D7%9E%D7%9C%D7%9B%D7%99%20%D7%94%D7%A6%D7%A4%D7%95%D7%9F.docx"}, {"id": "x_590c8d8e81ee", "name": "מלחמת הצפון למחברת", "type": "word", "size": "12KB", "topic": "פרק יא", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%9C%D7%97%D7%9E%D7%AA%20%D7%94%D7%A6%D7%A4%D7%95%D7%9F%20%D7%9C%D7%9E%D7%97%D7%91%D7%A8%D7%AA.docx"}, {"id": "x_468f73f22be0", "name": "24 -ג", "type": "word", "size": "27KB", "topic": "פרק יב", "category": "דפי עבודה ומבחנים", "url": "files/24%20-%D7%92.docx"}, {"id": "x_e1693634faf1", "name": "lilmodveodyungerman1230670", "type": "word", "size": "717KB", "topic": "פרק יב", "category": "דפי עבודה ומבחנים", "url": "files/lilmodveodyungerman1230670.doc"}, {"id": "x_dc9b440d78ab", "name": "25 -ג", "type": "word", "size": "24KB", "topic": "פרק יג", "category": "דפי עבודה ומבחנים", "url": "files/25%20-%D7%92.docx"}, {"id": "x_665a08ff334a", "name": "25 -ד", "type": "word", "size": "21KB", "topic": "פרק יג", "category": "דפי עבודה ומבחנים", "url": "files/25%20-%D7%93.docx"}, {"id": "x_c08e15a98611", "name": "מפה פרק יג", "type": "word", "size": "18KB", "topic": "פרק יג", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%A4%D7%94%20%D7%A4%D7%A8%D7%A7%20%D7%99%D7%92.docx"}, {"id": "x_44390e5d24f8", "name": "שאלות פרק יג", "type": "word", "size": "14KB", "topic": "פרק יג", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A4%D7%A8%D7%A7%20%D7%99%D7%92.docx"}, {"id": "x_c8e99127f473", "name": "27 -ג", "type": "word", "size": "29KB", "topic": "פרק יד", "category": "דפי עבודה ומבחנים", "url": "files/27%20-%D7%92.docx"}, {"id": "x_0478f6c082cd", "name": "27 -ד", "type": "word", "size": "25KB", "topic": "פרק יד", "category": "דפי עבודה ומבחנים", "url": "files/27%20-%D7%93.docx"}, {"id": "x_9d7b952cd107", "name": "2מפת חלוקת הארץ לשבטים", "type": "word", "size": "212KB", "topic": "פרק יד", "category": "דפי עבודה ומבחנים", "url": "files/2%D7%9E%D7%A4%D7%AA%20%D7%97%D7%9C%D7%95%D7%A7%D7%AA%20%D7%94%D7%90%D7%A8%D7%A5%20%D7%9C%D7%A9%D7%91%D7%98%D7%99%D7%9D.docx"}, {"id": "x_7cb35f66b09e", "name": "מפת חלוקת הארץ לשבטים", "type": "word", "size": "207KB", "topic": "פרק יד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9E%D7%A4%D7%AA%20%D7%97%D7%9C%D7%95%D7%A7%D7%AA%20%D7%94%D7%90%D7%A8%D7%A5%20%D7%9C%D7%A9%D7%91%D7%98%D7%99%D7%9D.docx"}, {"id": "x_85ee374cb6b2", "name": "שאלות פרק יד", "type": "word", "size": "14KB", "topic": "פרק יד", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A4%D7%A8%D7%A7%20%D7%99%D7%93.docx"}, {"id": "x_5dbef7e694d0", "name": "32 -ג", "type": "word", "size": "25KB", "topic": "פרק יח", "category": "דפי עבודה ומבחנים", "url": "files/32%20-%D7%92.docx"}, {"id": "x_a04fb6ae0706", "name": "32 -ד", "type": "word", "size": "23KB", "topic": "פרק יח", "category": "דפי עבודה ומבחנים", "url": "files/32%20-%D7%93.docx"}, {"id": "x_32b321e1cdc9", "name": "33 -ג", "type": "word", "size": "26KB", "topic": "פרק יח", "category": "דפי עבודה ומבחנים", "url": "files/33%20-%D7%92.docx"}, {"id": "x_e896c2d36ed5", "name": "33 -ד", "type": "word", "size": "24KB", "topic": "פרק יח", "category": "דפי עבודה ומבחנים", "url": "files/33%20-%D7%93.docx"}, {"id": "x_344894f698c3", "name": "שאלות פרק יח", "type": "word", "size": "14KB", "topic": "פרק יח", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A9%D7%90%D7%9C%D7%95%D7%AA%20%D7%A4%D7%A8%D7%A7%20%D7%99%D7%97.docx"}, {"id": "x_b72980290637", "name": "34 -ג", "type": "word", "size": "27KB", "topic": "פרק יט", "category": "דפי עבודה ומבחנים", "url": "files/34%20-%D7%92.docx"}, {"id": "x_8fcd11900776", "name": "34 -ד", "type": "word", "size": "22KB", "topic": "פרק יט", "category": "דפי עבודה ומבחנים", "url": "files/34%20-%D7%93.docx"}, {"id": "x_0093bdcfbc93", "name": "35 -ג", "type": "word", "size": "28KB", "topic": "פרק כ", "category": "דפי עבודה ומבחנים", "url": "files/35%20-%D7%92.docx"}, {"id": "x_3d9d69e71b71", "name": "35 -ד", "type": "word", "size": "25KB", "topic": "פרק כ", "category": "דפי עבודה ומבחנים", "url": "files/35%20-%D7%93.docx"}, {"id": "x_81f243acd59a", "name": "ערי מקלט- כ תשובון", "type": "word", "size": "70KB", "topic": "פרק כ", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A2%D7%A8%D7%99%20%D7%9E%D7%A7%D7%9C%D7%98-%20%D7%9B%20%D7%AA%D7%A9%D7%95%D7%91%D7%95%D7%9F.doc"}, {"id": "x_c3c7a6c70bdc", "name": "ערי מקלט- כ", "type": "word", "size": "70KB", "topic": "פרק כ", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A2%D7%A8%D7%99%20%D7%9E%D7%A7%D7%9C%D7%98-%20%D7%9B.doc"}, {"id": "x_1771275ec319", "name": "ערי מקלט", "type": "pdf", "size": "206KB", "topic": "פרק כ", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A2%D7%A8%D7%99%20%D7%9E%D7%A7%D7%9C%D7%98.pdf"}, {"id": "x_167645d70864", "name": "36 -ג", "type": "word", "size": "29KB", "topic": "פרק כא", "category": "דפי עבודה ומבחנים", "url": "files/36%20-%D7%92.docx"}, {"id": "x_8571cae9bc79", "name": "36 -ד", "type": "word", "size": "26KB", "topic": "פרק כא", "category": "דפי עבודה ומבחנים", "url": "files/36%20-%D7%93.docx"}, {"id": "x_13e95e272859", "name": "37 -ג", "type": "word", "size": "25KB", "topic": "פרק כא", "category": "דפי עבודה ומבחנים", "url": "files/37%20-%D7%92.docx"}, {"id": "x_45d0d2ef0995", "name": "37 -ד", "type": "word", "size": "23KB", "topic": "פרק כא", "category": "דפי עבודה ומבחנים", "url": "files/37%20-%D7%93.docx"}, {"id": "x_ecaabb685f9d", "name": "יהושע כ -כא חידון ערי המקלט", "type": "ppt", "size": "89KB", "topic": "פרק כא", "category": "משחקים וחידונים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%9B%20-%D7%9B%D7%90%20%D7%97%D7%99%D7%93%D7%95%D7%9F%20%D7%A2%D7%A8%D7%99%20%D7%94%D7%9E%D7%A7%D7%9C%D7%98.pptx"}, {"id": "x_984524f74965", "name": "ערי הלויים והכהנים- דף עבודה- משחק", "type": "word", "size": "59KB", "topic": "פרק כא", "category": "משחקים וחידונים", "url": "files/%D7%A2%D7%A8%D7%99%20%D7%94%D7%9C%D7%95%D7%99%D7%99%D7%9D%20%D7%95%D7%94%D7%9B%D7%94%D7%A0%D7%99%D7%9D-%20%D7%93%D7%A3%20%D7%A2%D7%91%D7%95%D7%93%D7%94-%20%D7%9E%D7%A9%D7%97%D7%A7.docx"}, {"id": "x_180877c0c275", "name": "ערי הלויים- כא תשובון", "type": "word", "size": "52KB", "topic": "פרק כא", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A2%D7%A8%D7%99%20%D7%94%D7%9C%D7%95%D7%99%D7%99%D7%9D-%20%D7%9B%D7%90%20%D7%AA%D7%A9%D7%95%D7%91%D7%95%D7%9F.doc"}, {"id": "x_fb552256b46b", "name": "ערי הלויים- כא", "type": "word", "size": "52KB", "topic": "פרק כא", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A2%D7%A8%D7%99%20%D7%94%D7%9C%D7%95%D7%99%D7%99%D7%9D-%20%D7%9B%D7%90.doc"}, {"id": "x_b076e72ce52e", "name": "40 -ג", "type": "word", "size": "69KB", "topic": "פרק כב", "category": "דפי עבודה ומבחנים", "url": "files/40%20-%D7%92.docx"}, {"id": "x_ab0ab655c07d", "name": "40 -ד", "type": "word", "size": "77KB", "topic": "פרק כב", "category": "דפי עבודה ומבחנים", "url": "files/40%20-%D7%93.docx"}, {"id": "x_117b761e9988", "name": "יהושע פרק כב", "type": "word", "size": "27KB", "topic": "פרק כב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A4%D7%A8%D7%A7%20%D7%9B%D7%91.doc"}, {"id": "x_8c4f3270845d", "name": "פרק כב", "type": "pdf", "size": "226KB", "topic": "פרק כב", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A4%D7%A8%D7%A7%20%D7%9B%D7%91.pdf"}, {"id": "x_63d9cff98ece", "name": "41 -ג(1)", "type": "word", "size": "77KB", "topic": "פרק כג", "category": "דפי עבודה ומבחנים", "url": "files/41%20-%D7%92%281%29.docx"}, {"id": "x_75ab13015a03", "name": "41 -ד(1)", "type": "word", "size": "73KB", "topic": "פרק כג", "category": "דפי עבודה ומבחנים", "url": "files/41%20-%D7%93%281%29.docx"}, {"id": "x_1ab82bd2a719", "name": "כג- כד", "type": "word", "size": "107KB", "topic": "פרק כג", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9B%D7%92-%20%D7%9B%D7%93.docx"}, {"id": "x_fdc6df8f9bdd", "name": "42 -ג(1)", "type": "word", "size": "76KB", "topic": "פרק כד", "category": "דפי עבודה ומבחנים", "url": "files/42%20-%D7%92%281%29.docx"}, {"id": "x_6ef42798c4c5", "name": "42 -ד(1)", "type": "word", "size": "69KB", "topic": "פרק כד", "category": "דפי עבודה ומבחנים", "url": "files/42%20-%D7%93%281%29.docx"}, {"id": "x_05db2a2010fc", "name": "43 -ג(1)", "type": "word", "size": "90KB", "topic": "פרק כד", "category": "דפי עבודה ומבחנים", "url": "files/43%20-%D7%92%281%29.docx"}, {"id": "x_a1800652edc5", "name": "43 -ד(1)", "type": "word", "size": "87KB", "topic": "פרק כד", "category": "דפי עבודה ומבחנים", "url": "files/43%20-%D7%93%281%29.docx"}, {"id": "x_2ecd9465028d", "name": "44 -ג(1)", "type": "word", "size": "109KB", "topic": "פרק כד", "category": "דפי עבודה ומבחנים", "url": "files/44%20-%D7%92%281%29.docx"}, {"id": "x_f7beccad17ec", "name": "44 -ד(1)", "type": "word", "size": "85KB", "topic": "פרק כד", "category": "דפי עבודה ומבחנים", "url": "files/44%20-%D7%93%281%29.docx"}, {"id": "x_ee2c51bda5fa", "name": "binyamin yehoshua", "type": "word", "size": "115KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/binyamin%20yehoshua.doc"}, {"id": "x_b572a6b0a1db", "name": "מבדקון ספר יהושע", "type": "word", "size": "23KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9E%D7%91%D7%93%D7%A7%D7%95%D7%9F%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_192b96c94848", "name": "מבחן לפרק ז-י ביהושע מאליהו אמסלם", "type": "word", "size": "48KB", "topic": "פרק ז", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9E%D7%91%D7%97%D7%9F%20%D7%9C%D7%A4%D7%A8%D7%A7%20%D7%96-%D7%99%20%D7%91%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%9E%D7%90%D7%9C%D7%99%D7%94%D7%95%20%D7%90%D7%9E%D7%A1%D7%9C%D7%9D.doc"}, {"id": "x_b721aba10651", "name": "מבחן על ספר יהושע", "type": "word", "size": "35KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9E%D7%91%D7%97%D7%9F%20%D7%A2%D7%9C%20%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.doc"}, {"id": "x_c7af119580ce", "name": "חרוזים מנוקד", "type": "word", "size": "80KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%97%D7%A8%D7%95%D7%96%D7%99%D7%9D%20%D7%9E%D7%A0%D7%95%D7%A7%D7%93.docx"}, {"id": "x_e1eb120ce867", "name": "יהושע מי רוצה להיות מליונר לסיום הספר", "type": "ppt", "size": "1.7MB", "topic": "כללי – כל הספר", "category": "מצגות", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%9E%D7%99%20%D7%A8%D7%95%D7%A6%D7%94%20%D7%9C%D7%94%D7%99%D7%95%D7%AA%20%D7%9E%D7%9C%D7%99%D7%95%D7%A0%D7%A8%20%D7%9C%D7%A1%D7%99%D7%95%D7%9D%20%D7%94%D7%A1%D7%A4%D7%A8.ppt"}, {"id": "x_fe2d9c976d1a", "name": "יהושע מסיבת סיום לספר יהושע", "type": "word", "size": "1.3MB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%9E%D7%A1%D7%99%D7%91%D7%AA%20%D7%A1%D7%99%D7%95%D7%9D%20%D7%9C%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_0f994c9a668b", "name": "יהושע סיום הספר רעיונות יפים", "type": "word", "size": "16KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A1%D7%99%D7%95%D7%9D%20%D7%94%D7%A1%D7%A4%D7%A8%20%D7%A8%D7%A2%D7%99%D7%95%D7%A0%D7%95%D7%AA%20%D7%99%D7%A4%D7%99%D7%9D.docx"}, {"id": "x_cf7ba5c9b02e", "name": "יהושע סיום חידות לסיום הספר", "type": "ppt", "size": "1.6MB", "topic": "כללי – כל הספר", "category": "משחקים וחידונים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%A1%D7%99%D7%95%D7%9D%20%D7%97%D7%99%D7%93%D7%95%D7%AA%20%D7%9C%D7%A1%D7%99%D7%95%D7%9D%20%D7%94%D7%A1%D7%A4%D7%A8.pptx"}, {"id": "x_6c4f873810fb", "name": "יהושע תוכנית למסיבת סיום", "type": "word", "size": "737KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%99%D7%94%D7%95%D7%A9%D7%A2%20%D7%AA%D7%95%D7%9B%D7%A0%D7%99%D7%AA%20%D7%9C%D7%9E%D7%A1%D7%99%D7%91%D7%AA%20%D7%A1%D7%99%D7%95%D7%9D.docx"}, {"id": "x_ff9b1b53ba19", "name": "מסיבה לסיום יהושע", "type": "word", "size": "16KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%9E%D7%A1%D7%99%D7%91%D7%94%20%D7%9C%D7%A1%D7%99%D7%95%D7%9D%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.docx"}, {"id": "x_5677b1a3d476", "name": "מפה לשבטים", "type": "word", "size": "202KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%A4%D7%94%20%D7%9C%D7%A9%D7%91%D7%98%D7%99%D7%9D.docx"}, {"id": "x_383db114f52c", "name": "פאזל", "type": "word", "size": "4.5MB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A4%D7%90%D7%96%D7%9C.docx"}, {"id": "x_3fb713ecf131", "name": "פתקים למעטפות", "type": "word", "size": "26KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A4%D7%AA%D7%A7%D7%99%D7%9D%20%D7%9C%D7%9E%D7%A2%D7%98%D7%A4%D7%95%D7%AA.docx"}, {"id": "x_8ce108da194f", "name": "ציורים בספר יהושע", "type": "pdf", "size": "790KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A6%D7%99%D7%95%D7%A8%D7%99%D7%9D%20%D7%91%D7%A1%D7%A4%D7%A8%20%D7%99%D7%94%D7%95%D7%A9%D7%A2.pdf"}, {"id": "x_9e98d08bb6df", "name": "תחנות מסיבת סיום", "type": "word", "size": "36KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%AA%D7%97%D7%A0%D7%95%D7%AA%20%D7%9E%D7%A1%D7%99%D7%91%D7%AA%20%D7%A1%D7%99%D7%95%D7%9D.docx"}, {"id": "x_4eb0d0158f3d", "name": "דף הוראות לצביעת מפת הנחלות", "type": "word", "size": "28KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%93%D7%A3%20%D7%94%D7%95%D7%A8%D7%90%D7%95%D7%AA%20%D7%9C%D7%A6%D7%91%D7%99%D7%A2%D7%AA%20%D7%9E%D7%A4%D7%AA%20%D7%94%D7%A0%D7%97%D7%9C%D7%95%D7%AA.doc"}, {"id": "x_46e4c19a1f9b", "name": "מפה ריקה 2", "type": "word", "size": "81KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%A4%D7%94%20%D7%A8%D7%99%D7%A7%D7%94%202.docx"}, {"id": "x_4301d05c596d", "name": "מפה ריקה", "type": "word", "size": "75KB", "topic": "כללי – כל הספר", "category": "קיר ומפות ועיצוב", "url": "files/%D7%9E%D7%A4%D7%94%20%D7%A8%D7%99%D7%A7%D7%94.docx"}, {"id": "x_3abd452eb230", "name": "נחלות השבטים", "type": "pdf", "size": "466KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/%D7%A0%D7%97%D7%9C%D7%95%D7%AA%20%D7%94%D7%A9%D7%91%D7%98%D7%99%D7%9D.pdf"}, {"id": "x_082ff64d4052", "name": "Annual-planning-shmot", "type": "pdf", "size": "402KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/Annual-planning-shmot.pdf"}, {"id": "x_1ef7b085d28b", "name": "anthem-joshua1", "type": "pdf", "size": "85KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/anthem-joshua1.pdf"}, {"id": "x_22df3c12a42a", "name": "chapter1", "type": "pdf", "size": "369KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter1.pdf"}, {"id": "x_4cb9ba29a87b", "name": "chapter10", "type": "pdf", "size": "330KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter10.pdf"}, {"id": "x_ba6fe0c1f3b9", "name": "chapter11", "type": "pdf", "size": "418KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter11.pdf"}, {"id": "x_7011c1be3f2f", "name": "chapter12-13", "type": "pdf", "size": "919KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter12-13.pdf"}, {"id": "x_b1c3fd72a2c1", "name": "chapter14-15", "type": "pdf", "size": "655KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter14-15.pdf"}, {"id": "x_0925a19131bd", "name": "chapter16-17", "type": "pdf", "size": "680KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter16-17.pdf"}, {"id": "x_c2236f378382", "name": "chapter20", "type": "pdf", "size": "473KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter20.pdf"}, {"id": "x_583fac238211", "name": "chapter21", "type": "pdf", "size": "397KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter21.pdf"}, {"id": "x_97ea07eff670", "name": "chapter22", "type": "pdf", "size": "589KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter22.pdf"}, {"id": "x_9c3f168efafb", "name": "chapter23", "type": "pdf", "size": "303KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter23.pdf"}, {"id": "x_8af741304aa8", "name": "chapter24", "type": "pdf", "size": "288KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter24.pdf"}, {"id": "x_c53cea0827aa", "name": "chapter5", "type": "pdf", "size": "137KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter5.pdf"}, {"id": "x_2ed2c57be6bd", "name": "chapter6", "type": "pdf", "size": "330KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter6.pdf"}, {"id": "x_311e14928980", "name": "chapter7", "type": "pdf", "size": "288KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter7.pdf"}, {"id": "x_f3790e9cd3b1", "name": "chapter8", "type": "pdf", "size": "280KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter8.pdf"}, {"id": "x_a6155e5cdb73", "name": "chapter8b", "type": "pdf", "size": "116KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter8b.pdf"}, {"id": "x_7caed28aa601", "name": "chapter9", "type": "pdf", "size": "1.2MB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapter9.pdf"}, {"id": "x_eb50a8bf07af", "name": "chapters3-5", "type": "word", "size": "27KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/chapters3-5.docx"}, {"id": "x_f5d8101b8fba", "name": "guide-for-print", "type": "word", "size": "25KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/guide-for-print.docx"}, {"id": "x_ac9fde2d332c", "name": "guide-teacher-joshua", "type": "pdf", "size": "943KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/guide-teacher-joshua.pdf"}, {"id": "x_2baf41459182", "name": "guide-teacher-tjoshua", "type": "pdf", "size": "2.3MB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/guide-teacher-tjoshua.pdf"}, {"id": "x_888acb986ad6", "name": "guide-writing-work", "type": "pdf", "size": "145KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/guide-writing-work.pdf"}, {"id": "x_fe6eca2a72d1", "name": "Instructions-opening", "type": "pdf", "size": "223KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/Instructions-opening.pdf"}, {"id": "x_b24fe49446e1", "name": "joshua-18-19", "type": "pdf", "size": "527KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/joshua-18-19.pdf"}, {"id": "x_0233422faf32", "name": "joshua-print", "type": "word", "size": "132KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/joshua-print.docx"}, {"id": "x_1d34ace31a86", "name": "mitve-klaliy-yeho", "type": "pdf", "size": "372KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/mitve-klaliy-yeho.pdf"}, {"id": "x_37a24eb53e08", "name": "mitve-meforat-maavar-yarden", "type": "pdf", "size": "346KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/mitve-meforat-maavar-yarden.pdf"}, {"id": "x_de0c13081941", "name": "mitve-meforat-milchamot", "type": "pdf", "size": "666KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/mitve-meforat-milchamot.pdf"}, {"id": "x_56fadd082c75", "name": "opening", "type": "pdf", "size": "369KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/opening.pdf"}, {"id": "x_35eaed33dd8c", "name": "passing-jordan", "type": "pdf", "size": "244KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/passing-jordan.pdf"}, {"id": "x_df3235e903a8", "name": "spy-jericho", "type": "pdf", "size": "311KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/spy-jericho.pdf"}, {"id": "x_84fce4f624d6", "name": "time1", "type": "pdf", "size": "79KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/time1.pdf"}, {"id": "x_67d965ad42d6", "name": "work-paper-joshua", "type": "word", "size": "87KB", "topic": "כללי – כל הספר", "category": "דפי עבודה ומבחנים", "url": "files/work-paper-joshua.doc"}];
+const CATEGORY_ICONS = {"שיעורים - סרטונים ומצגות": "🎬", "דפי עבודה ומבחנים": "✏️", "מצגות": "🖥️", "קיר ומפות ועיצוב": "🗺️", "חומרים כלליים נוספים": "🗂️", "חוברות עבודה": "📚", "משחקים וחידונים": "🧩", "הדרכה ותכנון למורה": "🎓", "תיקיות וקישורים": "🔗"};
+const CATEGORY_ORDER = ["שיעורים - סרטונים ומצגות", "דפי עבודה ומבחנים", "מצגות", "קיר ומפות ועיצוב", "חומרים כלליים נוספים", "חוברות עבודה", "משחקים וחידונים", "הדרכה ותכנון למורה", "תיקיות וקישורים"];
+const TOPIC_EMOJI = {"הקדמה לספר": "🚩", "כללי – כל הספר": "📚", "פרק א": "📖", "פרק ב": "📖", "פרק ג": "📖", "פרק ד": "📖", "פרק ה": "📖", "פרק ו": "📖", "פרק ז": "📖", "פרק ח": "📖", "פרק ט": "📖", "פרק י": "📖", "פרק יא": "📖", "פרק יב": "📖", "פרק יג": "📖", "פרק יד": "📖", "פרק טו": "📖", "פרק טז": "📖", "פרק יח": "📖", "פרק יט": "📖", "פרק כ": "📖", "פרק כא": "📖", "פרק כב": "📖", "פרק כג": "📖", "פרק כד": "📖"};
+const TYPE_META = {"pdf": {"label": "PDF", "color": "#e11d48", "bg": "#fde8ec", "icon": "📕"}, "word": {"label": "Word", "color": "#2563eb", "bg": "#e8eefd", "icon": "📘"}, "ppt": {"label": "PowerPoint", "color": "#ea580c", "bg": "#fdece0", "icon": "📙"}, "excel": {"label": "Excel", "color": "#16a34a", "bg": "#e7f7ec", "icon": "📗"}, "image": {"label": "תמונה", "color": "#9333ea", "bg": "#f3e8fd", "icon": "🖼️"}, "audio": {"label": "שמע", "color": "#c2410c", "bg": "#ffedd5", "icon": "🎵"}, "video": {"label": "וידאו", "color": "#be185d", "bg": "#fce7f3", "icon": "🎬"}, "web": {"label": "דף אינטרנט", "color": "#0d9488", "bg": "#e6fbf8", "icon": "🌐"}, "other": {"label": "קובץ", "color": "#64748b", "bg": "#eef1f5", "icon": "📄"}, "folder": {"label": "תיקייה", "color": "#0d9488", "bg": "#e6fbf8", "icon": "📁"}};
+
+let currentTopic = ORDER[0];
+let currentQuery = '';
+let showHidden = false;
+let moveTargetId = null;
+
+const LS_PREFIX = 'yehoshua_v1_';
+const RENAME_KEY = LS_PREFIX + 'renamed';
+const HIDDEN_KEY = LS_PREFIX + 'hidden';
+const MOVE_KEY = LS_PREFIX + 'moved';
+const MY_RATING_KEY = LS_PREFIX + 'myratings';
+
+function loadSet(key) { try { return new Set(JSON.parse(localStorage.getItem(key) || '[]')); } catch (e) { return new Set(); } }
+function loadMap(key) { try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { return {}; } }
+function saveSet(key, set) { try { localStorage.setItem(key, JSON.stringify([...set])); } catch (e) {} }
+function saveMap(key, map) { try { localStorage.setItem(key, JSON.stringify(map)); } catch (e) {} }
+
+let HIDDEN = loadSet(HIDDEN_KEY);
+let RENAMED = loadMap(RENAME_KEY);
+let MOVED = loadMap(MOVE_KEY);
+let MY_RATINGS = loadMap(MY_RATING_KEY);
+
+function isHidden(id) { return HIDDEN.has(id); }
+function displayNameFor(item) { return RENAMED[item.id] || item.name; }
+function effectiveTopic(item) { return (MOVED[item.id] && MOVED[item.id].topic) || item.topic; }
+function effectiveCategory(item) { return (MOVED[item.id] && MOVED[item.id].category) || item.category; }
+
+function toggleHidden(id) { if (HIDDEN.has(id)) HIDDEN.delete(id); else HIDDEN.add(id); saveSet(HIDDEN_KEY, HIDDEN); render(); }
+
+function renderRatingBoxContent(box, id) {
+  const api = window.__ratingsApi;
+  const data = (api && api.ratingsCache.get(id)) || null;
+  const avg = data && data.count ? data.sum / data.count : 0;
+  const count = data ? data.count : 0;
+  const mine = MY_RATINGS[id] || 0;
+  box.classList.toggle('mine', !!mine);
+  box.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const s = document.createElement('span');
+    s.className = 'rating-star' + (i <= Math.round(avg) ? ' filled' : '');
+    s.textContent = i <= Math.round(avg) ? '★' : '☆';
+    s.title = mine ? `הדירוג שלך: ${mine}` : `דרגו ${i}`;
+    s.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); rateItem(id, i, box); });
+    box.appendChild(s);
+  }
+  const meta = document.createElement('span');
+  meta.className = 'rating-meta';
+  meta.textContent = count ? `${avg.toFixed(1)} (${count})` : 'דרגו ראשונים';
+  box.appendChild(meta);
+}
+
+function buildRatingBox(id) {
+  const box = document.createElement('span');
+  box.className = 'rating-box';
+  box.id = 'rt-' + id;
+  renderRatingBoxContent(box, id);
+  return box;
+}
+
+function rateItem(id, value, box) {
+  const old = MY_RATINGS[id] || 0;
+  MY_RATINGS[id] = value;
+  saveMap(MY_RATING_KEY, MY_RATINGS);
+  const api = window.__ratingsApi;
+  if (!api) return;
+  const cur = api.ratingsCache.get(id) || { sum: 0, count: 0 };
+  const nextSum = cur.sum + (old ? value - old : value);
+  const nextCount = cur.count + (old ? 0 : 1);
+  api.ratingsCache.set(id, { sum: nextSum, count: nextCount });
+  renderRatingBoxContent(box, id);
+  api.submitRating(id, value, old).catch(err => {
+    console.error('שגיאה בשמירת הדירוג', err);
+    alert('שגיאה בשמירת הדירוג לשרת - נסו שוב מאוחר יותר');
+  });
+}
+
+function updateRatingsUI(ids) {
+  if (!ids.length) return;
+  const doIt = () => {
+    window.__ratingsApi.fetchRatings(ids).then(() => {
+      ids.forEach(id => {
+        const box = document.getElementById('rt-' + id);
+        if (box) renderRatingBoxContent(box, id);
+      });
+    });
+  };
+  if (window.__ratingsApi) doIt();
+  else window.addEventListener('ratings-ready', doIt, { once: true });
+}
+
+function renameItem(id, currentName) {
+  const newName = prompt('שם חדש לתצוגה בקטלוג:', currentName);
+  if (newName === null) return;
+  const trimmed = newName.trim();
+  if (!trimmed) delete RENAMED[id]; else RENAMED[id] = trimmed;
+  saveMap(RENAME_KEY, RENAMED);
+  render();
+}
+
+function openMoveModal(id, curTopic, curCategory) {
+  moveTargetId = id;
+  const tSel = document.getElementById('moveTopicSelect');
+  const cSel = document.getElementById('moveCategorySelect');
+  tSel.innerHTML = ORDER.map(t => `<option value="${t}">${TOPIC_EMOJI[t] || ''} ${t}</option>`).join('');
+  tSel.value = curTopic;
+  cSel.innerHTML = CATEGORY_ORDER.map(c => `<option value="${c}">${CATEGORY_ICONS[c] || ''} ${c}</option>`).join('');
+  cSel.value = CATEGORY_ORDER.includes(curCategory) ? curCategory : CATEGORY_ORDER[0];
+  document.getElementById('moveModal').classList.add('open');
+}
+function closeMoveModal() { document.getElementById('moveModal').classList.remove('open'); moveTargetId = null; }
+
+document.getElementById('moveCancelBtn').addEventListener('click', closeMoveModal);
+document.getElementById('moveModal').addEventListener('click', (e) => { if (e.target.id === 'moveModal') closeMoveModal(); });
+document.getElementById('moveSaveBtn').addEventListener('click', () => {
+  if (!moveTargetId) return;
+  const topic = document.getElementById('moveTopicSelect').value;
+  const category = document.getElementById('moveCategorySelect').value;
+  MOVED[moveTargetId] = { topic, category };
+  saveMap(MOVE_KEY, MOVED);
+  closeMoveModal();
+  render();
+});
+
+document.getElementById('resetLink').addEventListener('click', () => {
+  if (!confirm('לאפס שינויי שם, הסתרות והעברות אישיות שביצעת בדפדפן זה? (הדירוגים המשותפים בענן לא יימחקו)')) return;
+  localStorage.removeItem(RENAME_KEY);
+  localStorage.removeItem(HIDDEN_KEY); localStorage.removeItem(MOVE_KEY);
+  HIDDEN = new Set(); RENAMED = {}; MOVED = {};
+  render();
+});
+
+function buildDriveUrl(id) { return 'https://drive.google.com/file/d/' + id + '/view'; }
+
+function buildGroups() {
+  const groups = {};
+  ORDER.forEach(t => { groups[t] = {}; });
+  FLAT_ITEMS.forEach(item => {
+    if (isHidden(item.id) && !showHidden) return;
+    const t = effectiveTopic(item);
+    const c = effectiveCategory(item);
+    if (!groups[t]) groups[t] = {};
+    if (!groups[t][c]) groups[t][c] = [];
+    groups[t][c].push(item);
+  });
+  return groups;
+}
+
+function renderTabs(groups) {
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = ORDER.map(t => {
+    const cats = groups[t] || {};
+    const n = Object.values(cats).reduce((s, arr) => s + arr.length, 0);
+    const active = t === currentTopic ? ' active' : '';
+    return `<button class="tab-btn${active}" data-topic="${t}">
+      <span class="tab-emoji">${TOPIC_EMOJI[t] || '📄'}</span>
+      <span class="tab-label">${t}</span>
+      <span class="tab-count">${n}</span></button>`;
+  }).join('');
+}
+
+function render() {
+  const groups = buildGroups();
+  renderTabs(groups);
+
+  const main = document.getElementById('main');
+  const empty = document.getElementById('emptyState');
+  main.innerHTML = '';
+
+  const q = currentQuery.trim();
+  const topicsToShow = q ? ORDER : [currentTopic];
+  let anyResults = false;
+  const visibleIds = [];
+
+  topicsToShow.forEach(topic => {
+    const cats = groups[topic] || {};
+    const sortedCats = CATEGORY_ORDER.filter(c => cats[c] && cats[c].length);
+    Object.keys(cats).forEach(c => { if (!sortedCats.includes(c)) sortedCats.push(c); });
+
+    let topicHasResults = false;
+    let topicTotal = 0;
+    const catBlocks = [];
+
+    sortedCats.forEach(cat => {
+      const items = (cats[cat] || []).filter(it => !q || displayNameFor(it).includes(q));
+      if (items.length === 0) return;
+      topicHasResults = true;
+      topicTotal += items.length;
+
+      const group = document.createElement('div');
+      group.className = 'category-group';
+      const header = document.createElement('div');
+      header.className = 'category-header';
+      header.innerHTML = `<span class="category-title">${CATEGORY_ICONS[cat] || '📄'} ${cat}</span>
+        <span style="display:flex;align-items:center;">
+          <span class="category-count">${items.length}</span>
+          <span class="category-toggle">▾</span>
+        </span>`;
+      const list = document.createElement('div');
+      list.className = 'file-list';
+      items.forEach(item => {
+        const meta = TYPE_META[item.type] || TYPE_META.other;
+        const hidden = isHidden(item.id);
+        const renamed = !!RENAMED[item.id];
+        const name = displayNameFor(item);
+        visibleIds.push(item.id);
+
+        const rowWrap = document.createElement('div');
+        rowWrap.className = 'file-row-wrap' + (hidden ? ' is-hidden' : '');
+
+        const ratingBox = buildRatingBox(item.id);
+
+        const renameBtn = document.createElement('button');
+        renameBtn.className = 'icon-btn';
+        renameBtn.type = 'button';
+        renameBtn.title = 'שינוי שם תצוגה';
+        renameBtn.textContent = '✏️';
+        renameBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); renameItem(item.id, name); });
+
+        const moveBtn = document.createElement('button');
+        moveBtn.className = 'icon-btn';
+        moveBtn.type = 'button';
+        moveBtn.title = 'העברה לנושא/קטגוריה אחרים';
+        moveBtn.textContent = '📁';
+        moveBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openMoveModal(item.id, topic, cat); });
+
+        const hideBtn = document.createElement('button');
+        hideBtn.className = 'icon-btn';
+        hideBtn.type = 'button';
+        hideBtn.title = hidden ? 'שחזור הקובץ (הצגה מחדש)' : 'הסתרת הקובץ';
+        hideBtn.textContent = hidden ? '👁️' : '🙈';
+        hideBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleHidden(item.id); });
+
+        const row = document.createElement('a');
+        row.className = 'file-row';
+        row.href = item.url || buildDriveUrl(item.id);
+        row.target = '_blank';
+        row.rel = 'noopener noreferrer';
+        row.innerHTML = `
+          <span class="file-icon" style="background:${meta.bg}">${meta.icon}</span>
+          <span class="file-name${renamed ? ' renamed' : ''}">${name}</span>
+          ${item.size ? `<span class="file-size">${item.size}</span>` : ''}
+          ${hidden ? '<span class="hidden-badge">מוסתר</span>' : ''}
+          <span class="file-type-badge" style="background:${meta.bg};color:${meta.color}">${meta.label}</span>
+        `;
+
+        rowWrap.appendChild(ratingBox);
+        rowWrap.appendChild(renameBtn);
+        rowWrap.appendChild(moveBtn);
+        rowWrap.appendChild(hideBtn);
+        rowWrap.appendChild(row);
+        list.appendChild(rowWrap);
+      });
+      header.addEventListener('click', () => {
+        list.classList.toggle('collapsed');
+        header.querySelector('.category-toggle').textContent = list.classList.contains('collapsed') ? '◂' : '▾';
+      });
+      group.appendChild(header);
+      group.appendChild(list);
+      catBlocks.push(group);
+    });
+
+    if (!topicHasResults) return;
+    anyResults = true;
+
+    if (q) {
+      const heading = document.createElement('div');
+      heading.className = 'topic-heading';
+      heading.innerHTML = `<h2>${TOPIC_EMOJI[topic] || '📄'} ${topic}</h2><span class="count">${topicTotal} תוצאות</span>`;
+      main.appendChild(heading);
+    }
+    catBlocks.forEach(b => main.appendChild(b));
+  });
+
+  empty.style.display = anyResults ? 'none' : 'block';
+  updateRatingsUI(visibleIds);
+}
+
+document.getElementById('search').addEventListener('input', (e) => { currentQuery = e.target.value; render(); });
+document.getElementById('showHiddenChk').addEventListener('change', (e) => { showHidden = e.target.checked; render(); });
+document.getElementById('tabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  currentTopic = btn.dataset.topic;
+  document.getElementById('search').value = '';
+  currentQuery = '';
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
